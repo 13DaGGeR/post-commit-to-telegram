@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+# 1. Update TELEGRAM_KEY and TELEGRAM_CHAT_ID
+# 2. Put the tile in .git/hooks in you REMOTE repository
+# 3. You should receive notification when someone pushes into the repository
+
+TELEGRAM_KEY = '000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+TELEGRAM_CHAT_ID = 1234567890;
+
+read DATA
+DATA_AR=($DATA)
+BRANCH=${DATA_AR[2]}
+REF=`echo "$BRANCH" | grep -Eo "[^ /]+\$"`
+AUTHOR=`git log $BRANCH -1 --format="%an"`
+COMMIT=`git log $BRANCH -1 --format="%h / %s"`
+
+MESSAGE="$AUTHOR@$REF: $COMMIT"
+
+curl -G "https://api.telegram.org/bot$TELEGRAM_KEY/sendMessage" --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" --data-urlencode "parse_mode=Markdown" --data-urlencode "text=$MESSAGE" >/dev/null 2>/dev/null
